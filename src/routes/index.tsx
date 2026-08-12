@@ -437,7 +437,7 @@ function LwsisHtmlConverter() {
                   onChange={(e) => setExcludePlaceholder(e.target.checked)}
                   className="rounded border-zinc-800 bg-zinc-950 text-violet-500 focus:ring-violet-500/20 h-4 w-4"
                 />
-                <span>Exclude Open / Empty Sections (Enrolled = 0)</span>
+                <span>Exclude Open Sections</span>
               </label>
             </div>
           </div>
@@ -634,8 +634,7 @@ export const parseHtml = (htmlContent: string, excludePlaceholder: boolean): Par
         // 3. Filter open/placeholder sections if toggle is active
         if (excludePlaceholder) {
           const isPlaceholder = 
-            currentSection.toLowerCase().includes('open') || 
-            enrolled === '0' || 
+            /(open|opne|oepn|opn)/i.test(currentSection) || 
             time === '01:00AM-01:00AM'
 
           if (isPlaceholder) {

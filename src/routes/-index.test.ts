@@ -83,4 +83,55 @@ describe('parseHtml parser logic', () => {
     expect(results[0].section).toBe('1CPE OPEN')
     expect(results[0].code).toBe('ENGG-111')
   })
+
+  it('should include rows with 0 enrollment but valid non-open sections when excludePlaceholder is active', () => {
+    const html = `
+      <table>
+        <tr>
+          <td colspan="3">Section: <u>1CPE01</u></td>
+          <td colspan="6">Section: <u>Course: 3024A Year: 1</u></td>
+        </tr>
+        <tr>
+          <td>ENGG-111</td>
+          <td>Calculus 1</td>
+          <td>3</td>
+          <td>M</td>
+          <td>02:00PM-03:00PM</td>
+          <td>SSC 404</td>
+          <td>0</td>
+          <td>VARONA, MARCELO E.</td>
+        </tr>
+      </table>
+    `
+    const results = parseHtml(html, true)
+    expect(results).toHaveLength(1)
+    expect(results[0].section).toBe('1CPE01')
+    expect(results[0].enrolled).toBe('0')
+  })
+
+  it('should skip sections with common typos of "open" (e.g. Opne, oepn, opn) when excludePlaceholder is active', () => {
+    const testCases = ['1CPE Opne', '1CPE oepn', '1CPE opn']
+    for (const section of testCases) {
+      const html = `
+        <table>
+          <tr>
+            <td colspan="3">Section: <u>${section}</u></td>
+            <td colspan="6">Section: <u>Course: 3024A Year: 1</u></td>
+          </tr>
+          <tr>
+            <td>ENGG-111</td>
+            <td>Calculus 1</td>
+            <td>3</td>
+            <td>M</td>
+            <td>02:00PM-03:00PM</td>
+            <td>TBA</td>
+            <td>0</td>
+            <td>,  .</td>
+          </tr>
+        </table>
+      `
+      const results = parseHtml(html, true)
+      expect(results).toHaveLength(0)
+    }
+  })
 })
